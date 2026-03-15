@@ -6,14 +6,7 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'development',
-                url: 'https://github.com/prajwalinna/online_clothes_store_devops.git'
-            }
-        }
-
+        
         stage('Install Backend Dependencies') {
             steps {
                 dir('backend') {
@@ -38,7 +31,7 @@ pipeline {
                     -Dsonar.projectKey=online-clothing-store \
                     -Dsonar.sources=. \
                     -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                    -Dsonar.login=sqa_0f12922c95892f7bb4e0ee6bad82e6c15c5ae56d
                     '''
                 }
             }
