@@ -1,14 +1,11 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        DOCKER_HOST = "unix:///home/prajwal-inna/.docker/desktop/docker.sock"
+    }
 
-        stage('Clone Repository') {
-            steps {
-                git branch: 'development',
-                    url: 'https://github.com/prajwalinna/online_clothes_store_devops.git'
-            }
-        }
+    stages {
 
         stage('Build Docker Images') {
             steps {
