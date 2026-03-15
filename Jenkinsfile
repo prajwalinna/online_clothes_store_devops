@@ -6,14 +6,7 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                git branch: 'development',
-                url: 'https://github.com/prajwalinna/online_clothes_store_devops.git'
-            }
-        }
-
+        
         stage('Install Backend Dependencies') {
             steps {
                 dir('backend') {
