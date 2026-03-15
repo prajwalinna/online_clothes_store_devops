@@ -30,6 +30,20 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=online-clothing-store \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 sh 'docker compose build'
@@ -47,5 +61,6 @@ pipeline {
                 sh 'docker ps'
             }
         }
+
     }
 }
