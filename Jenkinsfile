@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        
+
         stage('Install Backend Dependencies') {
             steps {
                 dir('backend') {
@@ -55,5 +55,26 @@ pipeline {
             }
         }
 
+    }
+
+    post {
+
+        success {
+            githubNotify context: 'online-clothing-ci',
+                         description: 'Build successful',
+                         status: 'SUCCESS'
+        }
+
+        failure {
+            githubNotify context: 'online-clothing-ci',
+                         description: 'Build failed',
+                         status: 'FAILURE'
+        }
+
+        unstable {
+            githubNotify context: 'online-clothing-ci',
+                         description: 'Build unstable',
+                         status: 'FAILURE'
+        }
     }
 }
