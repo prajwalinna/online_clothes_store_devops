@@ -82,4 +82,27 @@ pipeline {
             )
         }
     }
+    post {
+
+    success {
+        setGitHubPullRequestStatus(
+            context: 'jenkins/build',
+            state: 'SUCCESS'
+        )
+    }
+
+    failure {
+        setGitHubPullRequestStatus(
+            context: 'jenkins/build',
+            state: 'FAILURE'
+        )
+    }
+
+    unstable {
+        setGitHubPullRequestStatus(
+            context: 'jenkins/build',
+            state: 'FAILURE'
+        )
+    }
+}
 }
