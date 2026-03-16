@@ -67,28 +67,34 @@ pipeline {
 
         success {
             script {
-                setGitHubPullRequestStatus(
-                    context: 'jenkins/build',
-                    state: 'SUCCESS'
-                )
+                if (env.CHANGE_ID) {
+                    setGitHubPullRequestStatus(
+                        context: 'jenkins/build',
+                        state: 'SUCCESS'
+                    )
+                }
             }
         }
 
         failure {
             script {
-                setGitHubPullRequestStatus(
-                    context: 'jenkins/build',
-                    state: 'FAILURE'
-                )
+                if (env.CHANGE_ID) {
+                    setGitHubPullRequestStatus(
+                        context: 'jenkins/build',
+                        state: 'FAILURE'
+                    )
+                }
             }
         }
 
         unstable {
             script {
-                setGitHubPullRequestStatus(
-                    context: 'jenkins/build',
-                    state: 'FAILURE'
-                )
+                if (env.CHANGE_ID) {
+                    setGitHubPullRequestStatus(
+                        context: 'jenkins/build',
+                        state: 'FAILURE'
+                    )
+                }
             }
         }
 
