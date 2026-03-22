@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         DOCKER_HOST = "unix:///home/prajwal-inna/.docker/desktop/docker.sock"
+        NEXUS_REGISTRY="localhost:8083"
+        IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
+        GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
     }
 
     stages {
@@ -43,9 +46,12 @@ pipeline {
         //     }
         // }
 
-        stage('Build Docker Images') {
+        stage('Build and label Docker Images') {
             steps {
-                sh 'docker compose build'
+                script {
+                    sh "docker build -t ${NEXUS_REGISTRY}/cloth-shop/backend:${IMAGE_TAG} ./backend"
+                    sh "docker build -t ${NEXUS_REGISTRY}/cloth-shop/frontend:${IMAGE_TAG} ./frontend"
+                }
             }
         }
 
@@ -60,17 +66,37 @@ pipeline {
                 sh 'docker ps'
             }
         }
+
+        stage('Uploading the artifact to SonaType Nexus') {
+            when { expression { env.CHANGE_ID !=null } }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-creds',passwordVariable: 'NEXUS_PASS' , usernameVariable: 'NEXUS_USER')]){
+                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} http://${NEXUS_REGISTRY}"
+                    sh "docker push ${NEXUS_REGISTRY}/cloth-shop/backend:${IMAGE_TAG}"
+                    sh "docker push ${NEXUS_REGISTRY}/cloth-shop/frontend:${IMAGE_TAG}"
+
+                    sh "docker logout http://${NEXUS_REGISTRY}"
+                }
+            }
+        }
     }
 
     post {
-
         success {
             script {
                 if (env.CHANGE_ID) {
-                    setGitHubPullRequestStatus(
-                        context: 'jenkins/build',
-                        state: 'SUCCESS'
-                    )
+                    echo "Build successful! Pushed to Nexus. Merging PR #${env.CHANGE_ID}..."
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
+                        // GitHub API call to merge the PR
+                        sh """
+                        curl -s -X PUT \
+                          -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer \$GH_TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          -d '{"commit_title":"Merge PR #${env.CHANGE_ID} automatically via Jenkins", "merge_method":"merge"}' \
+                          https://api.github.com/repos/${GITHUB_REPO}/pulls/${env.CHANGE_ID}/merge
+                        """
+                    }
                 }
             }
         }
@@ -78,24 +104,24 @@ pipeline {
         failure {
             script {
                 if (env.CHANGE_ID) {
-                    setGitHubPullRequestStatus(
-                        context: 'jenkins/build',
-                        state: 'FAILURE'
-                    )
+                    echo "Build failed! Closing PR #${env.CHANGE_ID}..."
+                    withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
+                        // GitHub API call to close the PR
+                        sh """
+                        curl -s -X PATCH \
+                          -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer \$GH_TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          -d '{"state":"closed"}' \
+                          https://api.github.com/repos/${GITHUB_REPO}/pulls/${env.CHANGE_ID}
+                        """
+                    }
                 }
             }
         }
-
-        unstable {
-            script {
-                if (env.CHANGE_ID) {
-                    setGitHubPullRequestStatus(
-                        context: 'jenkins/build',
-                        state: 'FAILURE'
-                    )
-                }
-            }
+        
+        always {
+            sh 'docker compose down || true'
         }
-
     }
 }
