@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HOST = "unix:///home/prajwal-inna/.docker/desktop/docker.sock"
-        NEXUS_REGISTRY="localhost:8083"
+        NEXUS_REGISTRY="localhost"
         IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
         GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
     }
