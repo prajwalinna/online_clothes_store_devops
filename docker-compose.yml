@@ -2,7 +2,7 @@ services:
 
   mongo:
     image: mongo:6
-    
+
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
@@ -12,8 +12,6 @@ services:
 
   backend:
     build: ./backend
-    ports:
-      - "4000:4000"
     depends_on:
       mongo:
         condition: service_healthy
@@ -22,7 +20,5 @@ services:
 
   frontend:
     build: ./frontend
-    ports:
-      - "5173:5173"
     depends_on:
       - backend
