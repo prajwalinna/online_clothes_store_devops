@@ -60,12 +60,6 @@ pipeline {
                 sh 'docker ps'
             }
         }
-        stage('Upload artifact to nexus'){
-            steps {
-
-            }
-        }
-
     }
 
     post {
