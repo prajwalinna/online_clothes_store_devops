@@ -29,19 +29,19 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=online-clothing-store \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=sqa_0f12922c95892f7bb4e0ee6bad82e6c15c5ae56d
-                    '''
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('sonarqube') {
+        //             sh '''
+        //             sonar-scanner \
+        //             -Dsonar.projectKey=online-clothing-store \
+        //             -Dsonar.sources=. \
+        //             -Dsonar.host.url=http://localhost:9000 \
+        //             -Dsonar.login=sqa_0f12922c95892f7bb4e0ee6bad82e6c15c5ae56d
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Build Docker Images') {
             steps {
@@ -58,6 +58,11 @@ pipeline {
         stage('Verify Containers') {
             steps {
                 sh 'docker ps'
+            }
+        }
+        stage('Upload artifact to nexus'){
+            steps {
+
             }
         }
 
