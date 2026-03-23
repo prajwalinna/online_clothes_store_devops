@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HOST = "unix:///home/prajwal-inna/.docker/desktop/docker.sock"
-        NEXUS_REGISTRY="localhost"
+        NEXUS_REGISTRY="host.docker.internal"
         IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
         GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
     }
@@ -71,7 +71,7 @@ pipeline {
             when { expression { env.CHANGE_ID !=null } }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'nexus-creds',passwordVariable: 'NEXUS_PASS' , usernameVariable: 'NEXUS_USER')]){
-                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} http://${NEXUS_REGISTRY}"
+                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} https://${NEXUS_REGISTRY}"
                     sh "docker push ${NEXUS_REGISTRY}/cloth-shop/backend:${IMAGE_TAG}"
                     sh "docker push ${NEXUS_REGISTRY}/cloth-shop/frontend:${IMAGE_TAG}"
 
