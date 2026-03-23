@@ -87,7 +87,6 @@ pipeline {
                 if (env.CHANGE_ID) {
                     echo "Build successful! Pushed to Nexus. Merging PR #${env.CHANGE_ID}..."
                     withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
-                        // GitHub API call to merge the PR
                         sh """
                         curl -s -X PUT \
                           -H "Accept: application/vnd.github+json" \
@@ -106,7 +105,6 @@ pipeline {
                 if (env.CHANGE_ID) {
                     echo "Build failed! Closing PR #${env.CHANGE_ID}..."
                     withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
-                        // GitHub API call to close the PR
                         sh """
                         curl -s -X PATCH \
                           -H "Accept: application/vnd.github+json" \
