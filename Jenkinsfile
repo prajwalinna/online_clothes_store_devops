@@ -6,6 +6,7 @@ pipeline {
         NEXUS_REGISTRY="host.docker.internal"
         IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
         GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
+        DOCKER_HOST = "unix:///var/run/docker.sock"
     }
 
     stages {
