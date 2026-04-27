@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_REGISTRY="host.docker.internal"
+        NEXUS_REGISTRY = "192.168.29.10:8082"
+        NEXUS_REPO = "my-docker-repo"
         IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
         GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
     }
