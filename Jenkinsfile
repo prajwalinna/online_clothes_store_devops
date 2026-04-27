@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HOST = "unix:///home/prajwal-inna/.docker/desktop/docker.sock"
         NEXUS_REGISTRY="host.docker.internal"
         IMAGE_TAG="pr-${env.CHANGE_ID}-build-${env.BUILD_ID}"
         GITHUB_REPO = "prajwalinna/online_clothes_store_devops"
