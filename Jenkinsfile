@@ -32,25 +32,13 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         withSonarQubeEnv('sonarqube') {
-        //             sh '''
-        //             sonar-scanner \
-        //             -Dsonar.projectKey=online-clothing-store \
-        //             -Dsonar.sources=. \
-        //             -Dsonar.host.url=http://localhost:9000 \
-        //             -Dsonar.login=sqa_0f12922c95892f7bb4e0ee6bad82e6c15c5ae56d
-        //             '''
-        //         }
-        //     }
-        // }
-
-        stage('Build and label Docker Images') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    sh "docker build -t ${NEXUS_REGISTRY}/cloth-shop/backend:${IMAGE_TAG} ./backend"
-                    sh "docker build -t ${NEXUS_REGISTRY}/cloth-shop/frontend:${IMAGE_TAG} ./frontend"
+                    sh """
+                    docker build -t ${NEXUS_REGISTRY}/${NEXUS_REPO}/backend:${IMAGE_TAG} ./backend
+                    docker build -t ${NEXUS_REGISTRY}/${NEXUS_REPO}/frontend:${IMAGE_TAG} ./frontend
+                    """
                 }
             }
         }
@@ -67,15 +55,22 @@ pipeline {
             }
         }
 
-        stage('Uploading the artifact to SonaType Nexus') {
-            when { expression { env.CHANGE_ID !=null } }
+        stage('Push to Nexus') {
+            when { expression { env.CHANGE_ID != null } }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-creds',passwordVariable: 'NEXUS_PASS' , usernameVariable: 'NEXUS_USER')]){
-                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} https://${NEXUS_REGISTRY}"
-                    sh "docker push ${NEXUS_REGISTRY}/cloth-shop/backend:${IMAGE_TAG}"
-                    sh "docker push ${NEXUS_REGISTRY}/cloth-shop/frontend:${IMAGE_TAG}"
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    sh """
+                    docker login ${NEXUS_REGISTRY} -u ${NEXUS_USER} -p ${NEXUS_PASS}
 
-                    sh "docker logout http://${NEXUS_REGISTRY}"
+                    docker push ${NEXUS_REGISTRY}/${NEXUS_REPO}/backend:${IMAGE_TAG}
+                    docker push ${NEXUS_REGISTRY}/${NEXUS_REPO}/frontend:${IMAGE_TAG}
+
+                    docker logout ${NEXUS_REGISTRY}
+                    """
                 }
             }
         }
@@ -117,7 +112,7 @@ pipeline {
                 }
             }
         }
-        
+
         always {
             sh 'docker compose down || true'
         }
