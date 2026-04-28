@@ -1,8 +1,4 @@
-testing pr to close issue # directly
-testing pr to confirm the flow
-afdhsjlkdfhlakjshdfa
-testing pr to close issue # directly
-
-changes #3
-CI on PR changes 
-CI on PR
+This the test for the CI on PR 
+Test 101
+Test 102
+Test 103
